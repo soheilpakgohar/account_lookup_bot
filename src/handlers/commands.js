@@ -1,40 +1,39 @@
 // src/handlers/commands.js
-const { t, setLang, hasLanguage, languageKeyboard } = require('../i18n');
+const { t, resolveLang, languageKeyboard } = require('../i18n');
 
-/**
- * Registers /start, /help, and /language command handlers.
- * @param {TelegramBot} bot
- */
 function registerCommands(bot) {
 
-  // /start — show language picker if first time, else show welcome
+  // /start
   bot.onText(/\/start/, async (msg) => {
     const chatId    = msg.chat.id;
     const firstName = msg.from?.first_name || '';
+    const lang      = await resolveLang(chatId);
 
-    if (!hasLanguage(chatId)) {
-      // First visit — ask them to pick a language
-      return bot.sendMessage(chatId, t(chatId).chooseLanguage, {
+    if (!lang) {
+      // First visit — show language picker
+      return bot.sendMessage(chatId, t('en').chooseLanguage, {
         parse_mode:   'Markdown',
         reply_markup: languageKeyboard,
       });
     }
 
-    bot.sendMessage(chatId, t(chatId).welcome(firstName), {
+    bot.sendMessage(chatId, t(lang).welcome(firstName), {
       parse_mode: 'Markdown',
     });
   });
 
   // /help
-  bot.onText(/\/help/, (msg) => {
-    bot.sendMessage(msg.chat.id, t(msg.chat.id).help, {
-      parse_mode: 'Markdown',
-    });
+  bot.onText(/\/help/, async (msg) => {
+    const chatId = msg.chat.id;
+    const lang   = await resolveLang(chatId) || 'en';
+    bot.sendMessage(chatId, t(lang).help, { parse_mode: 'Markdown' });
   });
 
-  // /language — lets user switch language at any time
-  bot.onText(/\/language/, (msg) => {
-    bot.sendMessage(msg.chat.id, t(msg.chat.id).languageMenu, {
+  // /language — switch language at any time
+  bot.onText(/\/language/, async (msg) => {
+    const chatId = msg.chat.id;
+    const lang   = await resolveLang(chatId) || 'en';
+    bot.sendMessage(chatId, t(lang).languageMenu, {
       parse_mode:   'Markdown',
       reply_markup: languageKeyboard,
     });

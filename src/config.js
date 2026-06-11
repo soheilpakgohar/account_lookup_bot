@@ -3,34 +3,27 @@ require('dotenv').config();
 
 const config = {
   telegram: {
-    token: process.env.BOT_TOKEN,
-    polling: {
-      interval: 1000,
-      autoStart: true,
-      params: { timeout: 10 },
-    },
+    token:         process.env.BOT_TOKEN,
+    webhookSecret: process.env.WEBHOOK_SECRET, // optional but recommended
   },
   supabase: {
-    url:   process.env.SUPABASE_URL   || 'https://npunqibllmhpvsikalkt.supabase.co/rest/v1',
+    url:   process.env.SUPABASE_URL || 'https://npunqibllmhpvsikalkt.supabase.co/rest/v1',
     key:   process.env.SUPABASE_KEY,
     table: process.env.SUPABASE_TABLE || 'accounts',
   },
 };
 
-// ── Startup validation ────────────────────────────────────────────────────────
+// Only validate at runtime (not during Vercel build)
+function assertConfig() {
+  const missing = [];
+  if (!config.telegram.token) missing.push('BOT_TOKEN');
+  if (!config.supabase.key)   missing.push('SUPABASE_KEY');
 
-const missing = [];
-if (!config.telegram.token)  missing.push('BOT_TOKEN');
-if (!config.supabase.key)    missing.push('SUPABASE_KEY');
-
-if (missing.length > 0) {
-  console.error('');
-  console.error('❌  Missing required environment variables:');
-  missing.forEach(v => console.error(`    • ${v}`));
-  console.error('');
-  console.error('👉  Copy .env.example → .env and fill in the values.');
-  console.error('');
-  process.exit(1);
+  if (missing.length > 0) {
+    const msg = `Missing env vars: ${missing.join(', ')}`;
+    console.error('❌', msg);
+    throw new Error(msg);
+  }
 }
 
-module.exports = config;
+module.exports = { config, assertConfig };

@@ -1,17 +1,13 @@
 // src/keyboards.js
-// Builds the inline keyboard with a "Copy" button for every account detail.
-// Labels are now language-aware via the i18n system.
-
 const { t } = require('./i18n');
 
 /**
- * Returns an inline keyboard with per-field copy buttons, in the user's language.
- * @param {object} row     Account row from Supabase
- * @param {number} chatId  Used to pick the right language
+ * Build copy-button keyboard in the user's language.
+ * @param {object} row   Supabase account row
+ * @param {string} lang  'en' | 'fa'
  */
-function buildCopyKeyboard(row, chatId) {
-  const strings = t(chatId);
-  const btn = strings.copyButtons;
+function buildCopyKeyboard(row, lang) {
+  const btn = t(lang || 'en').copyButtons;
 
   const fields = [
     { label: btn.code,     field: 'code',     value: row.code },
@@ -21,17 +17,13 @@ function buildCopyKeyboard(row, chatId) {
     { label: btn.phone,    field: 'phone',    value: row.phone },
   ];
 
-  const keyboard = fields.map(({ label, field, value }) => {
-    const callbackData = `copy|${field}|${String(value)}`;
-    // Telegram hard limit: 64 bytes for callback_data
-    const safe = callbackData.length <= 64
-      ? callbackData
-      : `copy|${field}|${String(value).slice(0, 64 - field.length - 6)}`;
-
-    return [{ text: label, callback_data: safe }];
-  });
-
-  return { inline_keyboard: keyboard };
+  return {
+    inline_keyboard: fields.map(({ label, field, value }) => {
+      const raw  = `copy|${field}|${String(value)}`;
+      const safe = raw.length <= 64 ? raw : `copy|${field}|${String(value).slice(0, 58 - field.length)}`;
+      return [{ text: label, callback_data: safe }];
+    }),
+  };
 }
 
 module.exports = { buildCopyKeyboard };
