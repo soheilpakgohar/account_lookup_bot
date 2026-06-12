@@ -35,7 +35,7 @@ async function run() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       commands: [
-        { command: 'start',    description: 'Welcome / خوش آمدید' },
+        { command: 'start',    description: 'Start / شروع' },
         { command: 'help',     description: 'Help / راهنما' },
         { command: 'language', description: 'Change language / تغییر زبان' },
       ],
