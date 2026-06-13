@@ -22,7 +22,7 @@ registerCallbacks(bot);
 registerLookup(bot);
 
 bot.setMyCommands([
-  { command: 'start',    description: 'Welcome / خوش آمدید' },
+  { command: 'start',    description: 'Start / شروع' },
   { command: 'help',     description: 'Help / راهنما' },
   { command: 'language', description: 'Change language / تغییر زبان' },
 ]).catch(() => {});

@@ -21,7 +21,7 @@ registerLookup(bot);   // catch-all text handler must come last
 // ── Set bot command list (shows in Telegram's "/" menu) ───────────────────────
 
 bot.setMyCommands([
-  { command: 'start',    description: 'Welcome / خوش آمدید' },
+  { command: 'start',    description: 'Start / شروع' },
   { command: 'help',     description: 'Help / راهنما' },
   { command: 'language', description: 'Change language / تغییر زبان' },
 ]).catch(err => console.error('Could not set commands:', err.message));
